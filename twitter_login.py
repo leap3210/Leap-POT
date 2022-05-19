@@ -84,5 +84,4 @@ while 1:
 
 time.sleep(4)
 
-#print(spaceJoin)
 #WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='react-root'")))
