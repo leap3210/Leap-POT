@@ -7,7 +7,7 @@ import "@openzeppelin/contracts@4.6.0/security/Pausable.sol";
 import "@openzeppelin/contracts@4.6.0/access/AccessControl.sol";
 
 /// @custom:security-contact security-leap@mail.com
-contract ListenToEarnProtocol is ERC20, ERC20Burnable, Pausable, AccessControl {
+contract LeapNFT is ERC20, ERC20Burnable, Pausable, AccessControl {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
