@@ -6,7 +6,7 @@ import "hardhat/console.sol";
 /// @custom:security-contact security-leap@mail.com
 contract LeapUserRegistry {
 
-    mapping (address -> Listener);
+    mapping (address => Listener) public Listeners;
     
     struct Listener {
         // LEAP Token (ERC20) reward multiplayer. Default value 1.
