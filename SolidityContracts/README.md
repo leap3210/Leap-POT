@@ -18,3 +18,8 @@ So no rewards would be distributed.
 Additions:
 Implementation for IPFS CID and tokenURI once generative art is ready. 
 
+## LEAP Token (ERC20)
+
+Basic ERC20 contract: Pausable, Mintable, Burnable, with Roles
+
+Will be used in LEAP DAO.
