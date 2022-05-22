@@ -14,7 +14,8 @@ contract LeapHub {
     // NFT Contract to check listener's LEAP protocol subscription 
     address public leapSubscriptionContract;
     
-    // address public leapRewardsContract;
+    // Leap reward token contract (ERC20)
+    address public leapTokenContract;
     
     struct Listener {
         
@@ -29,9 +30,6 @@ contract LeapHub {
         // Last time rewards were calculated on chain
         uint256 lastCheckpoint;
 
-        // Owned LEAP NFT ID's
-        uint256[] leapNFTs;
-
     }
     
     mapping (address => Listener) public listeners;
@@ -42,17 +40,20 @@ contract LeapHub {
     // Reward rate for LEAP Token
     // Could be set by goverment contract
     uint256 public baseLeapRewardRate;
+
+    uint256 public initLeapRewardMultiplier;
+    uint256 public addLeapRewardMultiplier;
     
     // Reward destribution frequency (seconds)
     uint256 public leapRewardFrequency;
     
-    constructor (address _SubscriptionContract, address _leapRewardsContract) {
+    constructor (address _SubscriptionContract, address _leapTokenContract) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(ADMINISTARTOR_ROLE, msg.sender);
         
         leapSubscriptionContract = _SubscriptionContract;
-        // leapRewardsContract = _leapRewardsContract;
+        leapTokenContract = _leapTokenContract;
         setBaseLeapRewardRate(1 * 10 ** 18);
         setLeapRewardFrequency(5 * 60);
     }
@@ -79,6 +80,14 @@ contract LeapHub {
         leapRewardFrequency = _leapRewardFrequency;
     }
 
+    function setInitLeapRewardMultiplier(uint256 _multiplier) public onlyRole(ADMINISTARTOR_ROLE) {
+        initLeapRewardMultiplier = _multiplier;
+    }
+
+    function setAddLeapRewardMultiplier(uint256 _multiplier) public onlyRole(ADMINISTARTOR_ROLE) {
+        addLeapRewardMultiplier = _multiplier;
+    }
+
     //////////////////////////////////////////////////////
     /// Leap protocol's NFT logic (subscriptions)
     
@@ -98,17 +107,15 @@ contract LeapHub {
             // Transfer NFT into LeapHub contract
             leapSubscriptionContract.safeTransferFrom(msg.sender, address(this), _tokenIDs[i]);
 
-            // Update subscription owners
+            // Update subscription owners list
             subscriptionOwners[_tokenIDs[i]] = msg.sender;
 
             // Update reward multiplier rate according to amount NFT's staked
-            if (rewardMultiplier >= 1) {
-                rewardMultiplier += 0.1;
+            if (rewardMultiplier >= initLeapRewardMultiplier) {
+                rewardMultiplier += addLeapRewardMultiplier;
             } else {
-                rewardMultiplier = 1;
+                rewardMultiplier = initLeapRewardMultiplier;
             }
-
-            user.leapNFTs.push(_tokenIDs[i]);
         }
 
         // Calculate rewards for subscriber
@@ -130,22 +137,21 @@ contract LeapHub {
         for (uint256 i = 0; i < lenght; i++) {
             
             // Check ownership of NFT's to unstake
-            require(leapSubscriptionContract.ownerOf(_tokenIDs[i]) == msg.sender, "NOT_OWNER");
+            require(subscriptionOwners[_tokenIDs[i]] == msg.sender, "NOT_OWNER");
+            require(leapSubscriptionContract.ownerOf(_tokenIDs[i]) == address(this), "NOT_STAKED");
 
-            // Transfer NFT into LeapHub contract
-            leapSubscriptionContract.safeTransferFrom(msg.sender, address(this), _tokenIDs[i]);
+            // Transfer NFT to token owner
+            leapSubscriptionContract.safeTransferFrom(address(this), msg.sender, _tokenIDs[i]);
 
-            // Update subscription owners
-            subscriptionOwners[_tokenIDs[i]] = msg.sender;
-
+            // Update subscription owners list
+            subscriptionOwners[_tokenIDs[i]] = address(0);
+            
             // Update reward multiplier rate according to amount NFT's staked
-            if (rewardMultiplier >= 1) {
-                rewardMultiplier += 0.1;
+            if (rewardMultiplier > initLeapRewardMultiplier) {
+                rewardMultiplier -= addLeapRewardMultiplier;
             } else {
-                rewardMultiplier = 1;
+                rewardMultiplier = 0;
             }
-
-            user.leapNFTs.push(_tokenIDs[i]);
         }
 
         // Calculate rewards for subscriber
@@ -161,17 +167,27 @@ contract LeapHub {
     
     // Claim rewards
     function claim() public {
+        
+        Listener storage user = listeners[msg.sender];
+        accumulate(msg.sender);
 
+        // Send available rewards to listener
+        leapTokenContract._mint(msg.sender, user.leapRewards);
+        
+        // Set available rewards to claim for listener to 0
+        user.leapRewards = 0;
+        
     }
 
     // Accumulate rewards
     function accumulate(address _subscriber) internal {
         
-        // Set last chekpoint for reward accumulation
-        listeners[_subscriber].lastCheckpoint = block.timestamp;
-
         // Set accumulated rewards available to claim
         listeners[_subscriber].leapRewards += getRewards(_subscriber);
+        
+        // Set last chekpoint for reward accumulation
+        listeners[_subscriber].lastCheckpoint = block.timestamp;
+        
     }
     
     // Calculate listener rewards
