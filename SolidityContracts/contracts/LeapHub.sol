@@ -9,7 +9,8 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 contract LeapHub {
 
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-    bytes32 public constant MINTER_ROLE = keccak256("ADMINISTARTOR_ROLE");
+    bytes32 public constant GOVERNANCE_ROLE = keccak256("GOVERNANCE_ROLE");
+    bytes32 public constant USER_DATA_UPDATE_ROLE = keccak256("USER_DATA_UPDATE_ROLE");
   
     // NFT Contract to check listener's LEAP protocol subscription 
     address public leapSubscriptionContract;
@@ -27,8 +28,8 @@ contract LeapHub {
         // Unclaimed, accumulated rewards in LEAP Token(ERC20)
         uint256 leapRewards;
 
-        // Last time rewards were calculated on chain
-        uint256 lastCheckpoint;
+        // Time to be paid for subscriber (seconds)
+        uint256 timeToPay;
 
     }
     
@@ -50,7 +51,8 @@ contract LeapHub {
     constructor (address _SubscriptionContract, address _leapTokenContract) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
-        _grantRole(ADMINISTARTOR_ROLE, msg.sender);
+        _grantRole(GOVERNANCE_ROLE, msg.sender);
+        _grantRole(LISTEN_TIME_UPDATE_ROLE, msg.sender);
         
         leapSubscriptionContract = _SubscriptionContract;
         leapTokenContract = _leapTokenContract;
@@ -71,20 +73,20 @@ contract LeapHub {
     /// Available for specified role only
     
     // Set reward rate for Leap token
-    function setBaseLeapRewardRate(uint256 _rewardRate) public onlyRole(ADMINISTARTOR_ROLE) {
+    function setBaseLeapRewardRate(uint256 _rewardRate) public onlyRole(GOVERNANCE_ROLE) {
         baseLeapRewardRate = _rewardRate;
     }
 
     // Set Reward destribution frequency (seconds)
-    function setLeapRewardFrequency(uint256 _leapRewardFrequency) public onlyRole(ADMINISTARTOR_ROLE) {
+    function setLeapRewardFrequency(uint256 _leapRewardFrequency) public onlyRole(GOVERNANCE_ROLE) {
         leapRewardFrequency = _leapRewardFrequency;
     }
 
-    function setInitLeapRewardMultiplier(uint256 _multiplier) public onlyRole(ADMINISTARTOR_ROLE) {
+    function setInitLeapRewardMultiplier(uint256 _multiplier) public onlyRole(GOVERNANCE_ROLE) {
         initLeapRewardMultiplier = _multiplier;
     }
 
-    function setAddLeapRewardMultiplier(uint256 _multiplier) public onlyRole(ADMINISTARTOR_ROLE) {
+    function setAddLeapRewardMultiplier(uint256 _multiplier) public onlyRole(GOVERNANCE_ROLE) {
         addLeapRewardMultiplier = _multiplier;
     }
 
@@ -186,7 +188,7 @@ contract LeapHub {
         listeners[_subscriber].leapRewards += getRewards(_subscriber);
         
         // Set last chekpoint for reward accumulation
-        listeners[_subscriber].lastCheckpoint = block.timestamp;
+        listeners[_subscriber].timeToPay = 0;
         
     }
     
@@ -195,14 +197,31 @@ contract LeapHub {
         
         Listener memory user = listeners[_subscriber];
 
-        if (user.lastCheckpoint == 0) {
+        if (user.timeToPay == 0) {
             return 0;
         }
 
-        return((block.timestamp - user.lastCheckpoint) * (user.leapRewardMultiplier * baseLeapRewardRate)) / SECONDS_PER_DAY;
+        return(user.timeToPay * (user.leapRewardMultiplier * baseLeapRewardRate)) / SECONDS_PER_DAY;
     }
 
-    // Calculate reward values according to RewardPool of a Host Event and his Listeners contribution
+    // Update time to pay for listeners
+    // Accessible by Leap protocol's BOT
+    function updateTimeToPay(address[] memory _listeners, uint256[] memory _timeConfirmed) public onlyRole(USER_DATA_UPDATE_ROLE) {
+        
+        uint256 lenght = _listeners.lenght;
+
+        // Check that data arrays are same lenght
+        require(lenght == _timeConfirmed.lenght, "ARRAYS_NOT_EQUAL");
+        
+        // Update timeToPay value for every confirmed listener
+        for (uint256 i = 0; i < lenght; i++) {
+            
+            Listener storage user = listeners[_listeners[i]];
+
+            user.timeToPay += _timeConfirmed[i];
+
+        }
+    }
 
     // Transfer reward assets from RewardPool into Superfluid contract
 
