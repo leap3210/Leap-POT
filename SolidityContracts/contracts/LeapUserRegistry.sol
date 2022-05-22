@@ -26,13 +26,6 @@ contract LeapUserRegistry {
 
     }
 
-    address public leapSubscriptionNFT;
-
-    constructor (address _NFTContract) {
-        leapSubscriptionNFT = _NFTContract;
-
-    }
-
     // Register host (Stake NFT)
 
     // Register host event / project (Twitter Space)
