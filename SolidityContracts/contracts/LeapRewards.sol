@@ -5,8 +5,14 @@ pragma solidity ^0.8.4;
 contract LeapRewards {
     
     uint256 constant SECONDS_PER_DAY = 24 * 60 * 60;
-    uint256 public leapRewardRate = 1 * 10 ** 18;
-
+    
+    // Reward rate for LEAP Token
+    // Could be set by goverment contract
+    uint256 public baseLeapRewardRate = 1 * 10 ** 18;
+    
+    // Reward destribution frequency (seconds)
+    uint256 public leapRewardFrequency = 5; 
+    
     // Calculate reward values according to RewardPool of a Host Event and his Listeners contribution
 
     // Transfer reward assets from RewardPool into Superfluid contract

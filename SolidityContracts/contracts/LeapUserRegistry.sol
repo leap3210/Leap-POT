@@ -19,6 +19,10 @@ contract LeapUserRegistry {
         uint256[] leapNFTs;
     }
 
+    constructor (address _NFTContract) {
+        
+    }
+
     // Register host (Stake NFT)
 
     // Register host event / project (Twitter Space)
