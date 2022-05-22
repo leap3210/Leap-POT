@@ -8,7 +8,8 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-/// @custom:security-contact security-leap@mail.com
+/// @custom:security-contact leap@mail.com
+/// With mark "Leap security"
 contract LeapNFT is ERC721, ERC721URIStorage, Pausable, AccessControl, ERC721Burnable {
     using Counters for Counters.Counter;
 

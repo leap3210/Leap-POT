@@ -6,7 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-/// @custom:security-contact security-leap@mail.com
+/// @custom:security-contact leap@mail.com
+/// With mark "Leap security"
 contract LeapERC20 is ERC20, ERC20Burnable, Pausable, AccessControl {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");

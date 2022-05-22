@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-/// @custom:security-contact security-leap@mail.com
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+/// @custom:security-contact leap@mail.com
+/// With mark "Leap security"
 contract LeapRewards {
     
     uint256 constant SECONDS_PER_DAY = 24 * 60 * 60;
@@ -25,6 +28,18 @@ contract LeapRewards {
     // Set Reward destribution frequency
     function (uint256 _leapRewardFrequency) public {
         leapRewardFrequency = _leapRewardFrequency;
+    }
+    
+    // Calculate listener rewards
+    function getRewards(address _subscriber) public view returns (uint256) {
+        
+        Listener memory user = listeners[_subscriber];
+
+        if (user.lastCheckpoint == 0) {
+            return 0;
+        }
+
+        return((block.timestamp - user.lastCheckpoint) * (user.leapRewardMultiplier * ))
     }
     
     // Calculate reward values according to RewardPool of a Host Event and his Listeners contribution

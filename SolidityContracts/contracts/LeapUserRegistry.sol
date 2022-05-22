@@ -3,7 +3,8 @@ pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
 
-/// @custom:security-contact security-leap@mail.com
+/// @custom:security-contact leap@mail.com
+/// With mark "Leap security"
 contract LeapUserRegistry {
 
     mapping (address => Listener) public Listeners;

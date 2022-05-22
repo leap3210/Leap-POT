@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-/// @custom:security-contact security-leap@mail.com
+/// @custom:security-contact leap@mail.com
+/// With mark "Leap security"
 contract LeapHub {
   
     // NFT Contract to check listener LEAP protocol subscription 
     address public leapSubscriptionContract;
+    address public leapRewardsContract;
     
     struct Listener {
         
@@ -30,6 +32,7 @@ contract LeapHub {
     
     constructor (address _SubscriptionContract) {
         leapSubscriptionContract = _SubscriptionContract;
+        leapRewardsContract = _leapRewardsContract;
     }
     
     // Stake LeapNFT
@@ -79,7 +82,11 @@ contract LeapHub {
 
     }
 
+    // Accumulate rewards
     function accumulate(address _subscriber) internal {
+        
+        // Set last chekpoint for reward accumulation
+        listeners[_subscriber].lastCheckpoint = block.timestamp;
     }
 
     // Get Owners list of staked LeapNFTs
