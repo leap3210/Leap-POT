@@ -28,15 +28,15 @@ contract LeapHub {
     }
     
     mapping (address => Listener) public listeners;
-    mapping(uint256 => address) public subscriptionOwners;
+    mapping (uint256 => address) public subscriptionOwners;
     
-    constructor (address _SubscriptionContract) {
+    constructor (address _SubscriptionContract, address _leapRewardsContract) {
         leapSubscriptionContract = _SubscriptionContract;
         leapRewardsContract = _leapRewardsContract;
     }
     
     // Stake LeapNFT
-    function stake(uint256[] _tokenIDs) public {
+    function stake(uint256[] memory _tokenIDs) public {
         
         Listener storage user = listeners[msg.sender];
         uint256 rewardMultiplier = user.leapRewardMultiplier;
@@ -73,7 +73,7 @@ contract LeapHub {
     }
     
     // Unstake LeapNFT
-    function unstake(uint256[] _tokenIDs) public {
+    function unstake(uint256[] memory _tokenIDs) public {
         //    
     }
 
@@ -89,10 +89,26 @@ contract LeapHub {
         listeners[_subscriber].lastCheckpoint = block.timestamp;
     }
 
+    //////////////////////////////////////////////////////
+    
     // Get Owners list of staked LeapNFTs
 
     // Whitelist of allowed NFT contracts to stake
 
     // Update timeToPay for staked NFT owners (Listeners)
+
+    
+    
+    //////////////////////////////////////////////////////
+
+    /// User registry part
+
+    // Register host (Stake NFT)
+
+    // Register host event / project (Twitter Space)
+
+    // Set reward for event (Transfer ERC20)
+
+    // Turn-off Leap rewards
 
 }
