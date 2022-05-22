@@ -9,18 +9,28 @@ contract LeapUserRegistry {
     mapping (address => Listener) public Listeners;
     
     struct Listener {
-        // LEAP Token (ERC20) reward multiplayer. Default value 1.
+        
+        // LEAP Token (ERC20) reward multiplayer
+        // Update value on stake / unstake NFT tokens (subscritions)
+        // Could be set by governcance contract. Default = 1
         uint256 leapRewardMultiplier;
-        // Unclaimed, Accumulated LEAP Token rewards
+        
+        // Unclaimed, accumulated rewards in LEAP Token(ERC20)
         uint256 leapRewards;
+
         // Last time rewards were calculated on chain
         uint256 lastCheckpoint;
+
         // LEAP NFT ID's ownership
         uint256[] leapNFTs;
+
     }
 
+    address public leapSubscriptionNFT;
+
     constructor (address _NFTContract) {
-        
+        leapSubscriptionNFT = _NFTContract;
+
     }
 
     // Register host (Stake NFT)
