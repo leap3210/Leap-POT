@@ -14,12 +14,30 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
 
-  await greeter.deployed();
+  // Leap token (ERC20) contract
+  const _LeapERC20 = await hre.ethers.getContractFactory("LeapERC20");
+  const LeapERC20 = await _LeapERC20.deploy();
 
-  console.log("Greeter deployed to:", greeter.address);
+  await LeapERC20.deployed();
+
+  console.log("LeapERC20 deployed to:", LeapERC20.address);
+
+  // Leap NFT (subscription) contract
+  const _LeapNFT = await hre.ethers.getContractFactory("LeapNFT");
+  const LeapNFT = await _LeapNFT.deploy();
+
+  await LeapNFT.deployed();
+
+  console.log("LeapNFT deployed to:", LeapNFT.address);
+
+  // Leap NFT (subscription) contract
+  const _LeapHub = await hre.ethers.getContractFactory("LeapHub");
+  const LeapHub = await _LeapHub.deploy();
+
+  await LeapHub.deployed();
+
+  console.log("LeapHub deployed to:", LeapHub.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

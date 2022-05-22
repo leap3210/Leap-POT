@@ -17,6 +17,8 @@ contract LeapHub {
     
     // Leap reward token contract (ERC20)
     address public leapTokenContract;
+
+    address public superTokenFactory;
     
     struct Listener {
         
@@ -56,8 +58,11 @@ contract LeapHub {
         
         leapSubscriptionContract = _SubscriptionContract;
         leapTokenContract = _leapTokenContract;
+        superTokenFactory = 0x200657E2f123761662567A1744f9ACAe50dF47E6;     // Polygon Mumbai test network
+
         setBaseLeapRewardRate(1 * 10 ** 18);
         setLeapRewardFrequency(5 * 60);
+
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
