@@ -60,6 +60,13 @@ contract LeapHub {
 
             user.leapNFTs.push(_tokenIDs[i]);
         }
+
+        // Calculate rewards for subscriber
+        accumulate(msg.sender);
+
+        // Set new reward muiltiplier
+        user.leapRewardMultiplier = rewardMultiplier;
+
     }
     
     // Unstake LeapNFT
@@ -70,6 +77,9 @@ contract LeapHub {
     // Claim rewards
     function claim() public {
 
+    }
+
+    function accumulate(address _subscriber) internal {
     }
 
     // Get Owners list of staked LeapNFTs
