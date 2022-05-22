@@ -96,16 +96,18 @@ contract LeapHub {
     // Mint NFT token. Create subscription
     function mintNFT() public {
         
+        uint256[] tokenIDs;
+        
         // Mint NFT token for user
-        uint256 tokenID = leapSubscriptionContract.safeMint(msg.sender, _baseURI());
+        tokenIDs[0] = leapSubscriptionContract.safeMint(msg.sender, _baseURI());
 
         // Stake NFT into LeapHub contract (subscibe user)
-        stake(tokenID);
+        stake(tokenIDs);
 
     }
 
     function _baseURI() internal view virtual returns (string memory) {
-        return "";
+        return "bafybeifs2x3vtlft23egwavogdffsbiyj5axi2gon47zoy53lgywowhpvu";
     }
     
     // Stake LeapNFT
@@ -238,8 +240,8 @@ contract LeapHub {
         }
     }
 
-    // Transfer reward assets from RewardPool into Superfluid contract
-    function sendRewards() public onlyRole(USER_DATA_UPDATE_ROLE) {
+    // Distribute rewards through Superfluid contract
+    function distributeRewards() public onlyRole(USER_DATA_UPDATE_ROLE) {
         //
     }
 
