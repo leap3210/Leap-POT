@@ -31,11 +31,13 @@ contract LeapNFT is ERC721, ERC721URIStorage, Pausable, AccessControl, ERC721Bur
         _unpause();
     }
 
-    function safeMint(address to, string memory uri) public onlyRole(MINTER_ROLE) whenNotPaused {
+    // Only LeapHub contract can mint
+    function safeMint(address to, string memory uri) public onlyRole(MINTER_ROLE) whenNotPaused returns (uint256) {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
+        return(tokenId);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)

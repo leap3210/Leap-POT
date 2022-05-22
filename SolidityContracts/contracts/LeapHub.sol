@@ -92,6 +92,21 @@ contract LeapHub {
 
     //////////////////////////////////////////////////////
     /// Leap protocol's NFT logic (subscriptions)
+
+    // Mint NFT token. Create subscription
+    function mintNFT() public {
+        
+        // Mint NFT token for user
+        uint256 tokenID = leapSubscriptionContract.safeMint(msg.sender, _baseURI());
+
+        // Stake NFT into LeapHub contract (subscibe user)
+        stake(tokenID);
+
+    }
+
+    function _baseURI() internal view virtual returns (string memory) {
+        return "";
+    }
     
     // Stake LeapNFT
     function stake(uint256[] memory _tokenIDs) public {
