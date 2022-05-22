@@ -52,7 +52,7 @@ contract LeapHub {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(GOVERNANCE_ROLE, msg.sender);
-        _grantRole(LISTEN_TIME_UPDATE_ROLE, msg.sender);
+        _grantRole(USER_DATA_UPDATE_ROLE, msg.sender);
         
         leapSubscriptionContract = _SubscriptionContract;
         leapTokenContract = _leapTokenContract;
@@ -73,20 +73,20 @@ contract LeapHub {
     /// Available for specified role only
     
     // Set reward rate for Leap token
-    function setBaseLeapRewardRate(uint256 _rewardRate) public onlyRole(GOVERNANCE_ROLE) {
+    function setBaseLeapRewardRate(uint256 _rewardRate) public whenNotPaused onlyRole(GOVERNANCE_ROLE) {
         baseLeapRewardRate = _rewardRate;
     }
 
     // Set Reward destribution frequency (seconds)
-    function setLeapRewardFrequency(uint256 _leapRewardFrequency) public onlyRole(GOVERNANCE_ROLE) {
+    function setLeapRewardFrequency(uint256 _leapRewardFrequency) public whenNotPaused onlyRole(GOVERNANCE_ROLE) {
         leapRewardFrequency = _leapRewardFrequency;
     }
 
-    function setInitLeapRewardMultiplier(uint256 _multiplier) public onlyRole(GOVERNANCE_ROLE) {
+    function setInitLeapRewardMultiplier(uint256 _multiplier) public whenNotPaused onlyRole(GOVERNANCE_ROLE) {
         initLeapRewardMultiplier = _multiplier;
     }
 
-    function setAddLeapRewardMultiplier(uint256 _multiplier) public onlyRole(GOVERNANCE_ROLE) {
+    function setAddLeapRewardMultiplier(uint256 _multiplier) public whenNotPaused onlyRole(GOVERNANCE_ROLE) {
         addLeapRewardMultiplier = _multiplier;
     }
 
@@ -168,13 +168,13 @@ contract LeapHub {
     /// Rewards logic
     
     // Claim rewards
-    function claim() public {
+    function claim() public whenNotPaused {
         
         Listener storage user = listeners[msg.sender];
         accumulate(msg.sender);
 
         // Send available rewards to listener
-        leapTokenContract._mint(msg.sender, user.leapRewards);
+        leapTokenContract.mint(msg.sender, user.leapRewards);
         
         // Set available rewards to claim for listener to 0
         user.leapRewards = 0;
@@ -206,7 +206,7 @@ contract LeapHub {
 
     // Update time to pay for listeners
     // Accessible by Leap protocol's BOT
-    function updateTimeToPay(address[] memory _listeners, uint256[] memory _timeConfirmed) public onlyRole(USER_DATA_UPDATE_ROLE) {
+    function updateTimeToPay(address[] memory _listeners, uint256[] memory _timeConfirmed) public whenNotPaused onlyRole(USER_DATA_UPDATE_ROLE) {
         
         uint256 lenght = _listeners.lenght;
 
@@ -224,33 +224,10 @@ contract LeapHub {
     }
 
     // Transfer reward assets from RewardPool into Superfluid contract
+    function sendRewards() public onlyRole(USER_DATA_UPDATE_ROLE) {
+        //
+    }
 
     // Set recipients and amounts to recieve for Superfluid contract
-
-    // Update timeToPay for staked NFT owners (Listeners) on LeapHub.sol contract
-    // Set timeToPay to 0
-    // Set lastTimePaid to current blockstamp
     
-    //////////////////////////////////////////////////////
-    
-    // Get Owners list of staked LeapNFTs
-
-    // Whitelist of allowed NFT contracts to stake
-
-    // Update timeToPay for staked NFT owners (Listeners)
-
-    
-    
-    //////////////////////////////////////////////////////
-
-    /// User registry part
-
-    // Register host (Stake NFT)
-
-    // Register host event / project (Twitter Space)
-
-    // Set reward for event (Transfer ERC20)
-
-    // Turn-off Leap rewards
-
 }
